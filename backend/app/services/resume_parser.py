@@ -1,5 +1,5 @@
 import re
-import fitz  # PyMuPDF
+import pymupdf as fitz
 import logging
 from typing import Dict, Any, List
 
@@ -128,12 +128,7 @@ def _is_non_skill(skill_text: str, candidate_name: str = "") -> bool:
 
 class ResumeParser:
     def __init__(self):
-        try:
-            import spacy
-            self.nlp = spacy.load("en_core_web_sm")
-        except Exception:
-            logger.warning("spaCy model en_core_web_sm not found, using regex extraction fallback.")
-            self.nlp = None
+        self.nlp = None
 
     def extract_text_and_links(self, pdf_path: str) -> Dict[str, Any]:
         """Extract text and PDF embedded link URIs using PyMuPDF."""

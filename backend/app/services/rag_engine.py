@@ -6,10 +6,7 @@ os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
 
 import logging
 from typing import List, Dict, Any, Optional
-import fitz  # PyMuPDF
-from sentence_transformers import SentenceTransformer
-import chromadb
-from chromadb.utils import embedding_functions
+import pymupdf as fitz
 
 from app.config import get_settings
 
@@ -18,13 +15,21 @@ settings = get_settings()
 
 class RAGEngine:
     def __init__(self):
-        os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
-        self.chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
+        self._chroma_client = None
         self._embedding_model = None
 
     @property
-    def embedding_model(self) -> SentenceTransformer:
+    def chroma_client(self):
+        if self._chroma_client is None:
+            import chromadb
+            os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
+            self._chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
+        return self._chroma_client
+
+    @property
+    def embedding_model(self):
         if self._embedding_model is None:
+            from sentence_transformers import SentenceTransformer
             logger.info("Loading sentence-transformers/all-MiniLM-L6-v2 embedding model...")
             self._embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         return self._embedding_model

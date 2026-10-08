@@ -45,9 +45,16 @@ app.include_router(drives_router, prefix="/api/v1/hr/drives", tags=["drives"])
 app.include_router(candidates_router, prefix="/api/v1/candidates", tags=["candidates"])
 
 @app.get("/")
+@app.get("/healthz")
 async def root():
     return {
         "status": "ok",
         "message": "Welcome to AgentHire API",
         "version": "1.0.0"
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
+
