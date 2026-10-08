@@ -613,7 +613,7 @@ export default function CandidateDetailModal({ candidate, decision, onClose, onC
 
               <div className="flex items-center space-x-2">
                 <a
-                  href={`/api/v1/candidates/${candidate.candidate_id}/resume`}
+                  href={`${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '') : ''}/api/v1/candidates/${candidate.candidate_id}/resume`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center space-x-1"
@@ -633,7 +633,7 @@ export default function CandidateDetailModal({ candidate, decision, onClose, onC
             {/* PDF iframe Viewer */}
             <div className="flex-1 w-full bg-slate-100 relative">
               <iframe
-                src={`/api/v1/candidates/${candidate.candidate_id}/resume`}
+                src={`${import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '') : ''}/api/v1/candidates/${candidate.candidate_id}/resume`}
                 title={`${candidate.full_name} Resume`}
                 className="w-full h-full border-0 rounded-b-3xl"
               />
