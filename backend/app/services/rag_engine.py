@@ -6,7 +6,7 @@ os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
 
 import logging
 from typing import List, Dict, Any, Optional
-import pymupdf as fitz
+import pymupdf
 
 from app.config import get_settings
 
@@ -37,7 +37,7 @@ class RAGEngine:
     def extract_text_from_pdf(self, file_path: str) -> str:
         """Extract text from a PDF file using PyMuPDF."""
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             text_blocks = []
             for page in doc:
                 text_blocks.append(page.get_text())

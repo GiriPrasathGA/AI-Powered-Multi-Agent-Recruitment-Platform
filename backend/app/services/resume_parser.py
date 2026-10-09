@@ -1,5 +1,5 @@
 import re
-import pymupdf as fitz
+import pymupdf
 import logging
 from typing import Dict, Any, List
 
@@ -133,7 +133,7 @@ class ResumeParser:
     def extract_text_and_links(self, pdf_path: str) -> Dict[str, Any]:
         """Extract text and PDF embedded link URIs using PyMuPDF."""
         try:
-            doc = fitz.open(pdf_path)
+            doc = pymupdf.open(pdf_path)
             full_text = []
             extracted_uris = []
 

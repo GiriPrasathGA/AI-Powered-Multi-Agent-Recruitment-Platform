@@ -1,7 +1,27 @@
 import os
+import sys
+import logging
+
+# Ensure stdout and stderr are unbuffered so Render captures all output immediately
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(line_buffering=True)
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
+os.environ["PYTHONUNBUFFERED"] = "1"
 os.environ["USE_TF"] = "0"
 os.environ["USE_TORCH"] = "1"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    stream=sys.stdout
+)
+logger = logging.getLogger("agenthire.api")
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -15,12 +35,17 @@ from app.api.v1.candidates import router as candidates_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    os.makedirs("./data", exist_ok=True)
-    os.makedirs("./data/resumes", exist_ok=True)
-    await create_db_and_tables()
+    logger.info("Initializing AgentHire backend service...")
+    try:
+        os.makedirs("./data", exist_ok=True)
+        os.makedirs("./data/resumes", exist_ok=True)
+        await create_db_and_tables()
+        logger.info("AgentHire backend startup initialization completed.")
+    except Exception as e:
+        logger.error(f"Startup initialization encountered an error: {e}", exc_info=True)
     yield
     # Shutdown
-    pass
+    logger.info("AgentHire backend service shut down.")
 
 app = FastAPI(
     title="AgentHire API",
@@ -46,6 +71,7 @@ app.include_router(candidates_router, prefix="/api/v1/candidates", tags=["candid
 
 @app.get("/")
 @app.get("/healthz")
+@app.get("/api/healthz")
 async def root():
     return {
         "status": "ok",
@@ -56,5 +82,6 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
-    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
+    logger.info(f"Binding AgentHire API to 0.0.0.0:{port}...")
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, log_level="info")
 

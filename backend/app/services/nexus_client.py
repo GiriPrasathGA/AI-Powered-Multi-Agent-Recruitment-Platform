@@ -29,6 +29,9 @@ class NexusAIService:
             logger.error(f"Error generating text from Nexus: {e}")
             raise
 
+    async def generate_completion(self, prompt: str, temperature: float = 0.2) -> str:
+        return await self.generate("You are an expert AI recruiting assistant.", prompt, temperature=temperature)
+
     async def transcribe_audio(self, audio_bytes: bytes, filename: str = 'audio.wav') -> str:
         try:
             response = await self.client.audio.transcriptions.create(
